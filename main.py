@@ -87,7 +87,7 @@ def resultado():
         return f"<h1>{result}</h1>"
 
 
-@app.route("/cinepolis", methods=["POST"])
+@app.route("/cinepolis", methods=["GET", "POST"])
 def cinepolis():
     if request.method == "POST":
         cte = request.form.get("cte")
