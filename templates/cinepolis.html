@@ -1,0 +1,110 @@
+  <style>
+    body {
+      background: linear-gradient(rgba(0, 0, 255, 0.5), rgba(255, 255, 0, 0.5)),
+                 url("") no-repeat center center fixed;
+      background-size: cover;
+    }
+
+    div {
+      width: 300px; 
+      margin: 20px auto;
+      background-color: rgba(255, 255, 255, 0.8); 
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      margin-bottom: 8px;
+    }
+
+    input[type="text"],
+    input[type="radio"] {
+      padding: 8px;
+      margin-bottom: 12px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    input[name="valor_pagar"] {
+      margin-bottom: 20px;
+      float: right;
+    }
+
+    input[type="submit"],
+    input[type="button"] {
+      padding: 10px;
+      cursor: pointer;
+      background-color: #4CAF50;
+      margin-bottom: 3%; 
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+
+    input[type="submit"]:hover,
+    input[type="button"]:hover {
+      background-color: #FF0000; 
+    }
+  </style>
+
+<body>
+  <div>
+    <form id="cineForm" action="/cinepolis" method="POST">
+      <label>Cliente:</label>
+      <input type="text" name="cte" />
+
+      <label>Cantidad de compradores:</label>
+      <input type="text" name="compradores" />
+
+      <div class="nuevo">
+        <label>Tarjeta Cinepolis:</label>
+        <input type="radio" name="tarjeta" value="si" checked />
+        <label for="si">Si</label>
+    
+        <input type="radio" name="tarjeta" value="no" />
+        <label for="no">No</label>
+    </div>
+    
+
+      <label>Cantidad de boletos:</label>
+      <input type="text" name="boletos" />
+
+      <label>Valor a pagar:</label>
+      <input type="text" name="valor_pagar" id="valor_pagar" />
+
+      <input type="submit" value="Procesar" />
+      <input type="button" value="Salir" />
+    </form>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var cineForm = document.getElementById('cineForm');
+  
+      cineForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+  
+        var formData = new FormData(cineForm);
+  
+        fetch('/cinepolis', {
+          method: 'POST',
+          body: formData,
+        })
+          .then(response => response.json())
+          .then(data => {
+            if ('error' in data) {
+              alert(data.error);
+            } else {
+              document.getElementById('valor_pagar').value = data.valor_pagar;
+            }
+          })
+          .catch(error => console.error('Error:', error));
+      });
+    });
+  </script>
+</body>

@@ -1,4 +1,4 @@
-from flask import Flask,render_template,request
+from flask import Flask,render_template,request,jsonify
 
 app = Flask(__name__)
 
@@ -70,14 +70,11 @@ def resultado():
     if request.method == "POST":
         num1 = float(request.form.get("n1"))
         num2 = float(request.form.get("n2"))
-
         suma = "sum" in request.form
         resta = "res" in request.form
         multiplicacion = "mult" in request.form
         division = "div" in request.form
-
         result = ""
-
         if suma:
             result += f"Suma: {num1 + num2} "
         if resta:
@@ -88,6 +85,35 @@ def resultado():
             result += f"División: {num1 / num2} "
 
         return f"<h1>{result}</h1>"
+
+
+@app.route("/cinepolis", methods=["POST"])
+def cinepolis():
+    if request.method == "POST":
+        cte = request.form.get("cte")
+        compradores = int(request.form.get("compradores"))
+        tiene_tarjeta = request.form.get("tarjeta") == "si"
+        boletos = int(request.form.get("boletos"))
+        
+        if boletos > 7:
+            return jsonify({'error': 'No puedes comprar más de 7 boletos'})
+
+        precio_base = 12
+        descuento = 0
+
+        if boletos > 5:
+            descuento += 0.15
+        elif 3 <= boletos <= 5:
+            descuento += 0.1
+
+        if tiene_tarjeta:
+            descuento += 0.1
+
+        valor_pagar = precio_base * boletos * (1 - descuento)
+
+        return jsonify({'valor_pagar': valor_pagar})
+
+    return render_template("cinepolis.html")
 
 if __name__=="__main__":
     app.run(debug=True)
