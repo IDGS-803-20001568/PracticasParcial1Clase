@@ -1,5 +1,6 @@
 from flask import Flask,render_template,request,jsonify
-
+import forms
+import math
 app = Flask(__name__)
 
 
@@ -114,6 +115,30 @@ def cinepolis():
         return jsonify({'valor_pagar': valor_pagar})
 
     return render_template("cinepolis.html")
+
+
+
+@app.route("/distancia", methods=["GET", "POST"])
+def distancia():
+    alum_form = forms.UserForm(request.form)
+
+    if request.method == 'POST' and alum_form.validate():
+        x1 = float(alum_form.x1.data)
+        x2 = float(alum_form.x2.data)
+        y1 = float(alum_form.y1.data)
+        y2 = float(alum_form.y2.data)
+        distance = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+        alum_form.resultado.data = distance
+
+        # Agrega un log statement para imprimir el valor de resultado
+        print("Resultado:", alum_form.resultado.data)
+
+        return render_template("distancia.html", form=alum_form)
+
+    return render_template("distancia.html", form=alum_form)
+
+
+
 
 if __name__=="__main__":
     app.run(debug=True)
