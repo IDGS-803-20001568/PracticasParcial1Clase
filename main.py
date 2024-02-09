@@ -1,6 +1,8 @@
 from flask import Flask,render_template,request,jsonify
 import forms
 import math
+from formsR import ResistanceForm
+
 app = Flask(__name__)
 
 
@@ -130,7 +132,6 @@ def distancia():
         distance = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
         alum_form.resultado.data = distance
 
-        # Agrega un log statement para imprimir el valor de resultado
         print("Resultado:", alum_form.resultado.data)
 
         return render_template("distancia.html", form=alum_form)
@@ -139,6 +140,75 @@ def distancia():
 
 
 
+color_css_mapping = {
+    'Cafe': 'cafe',
+    'Rojo': 'rojo',
+    'Naranja': 'naranja',
+    'Negro': 'negro',
+    'Amarillo': 'amarillo',
+    'Azul': 'azul',
+    'Violeta': 'violeta',
+    'Gris': 'gris',
+    'Verde': 'verde',
+    'Blanco': 'blanco'
+}
 
+
+@app.route("/resistencia",methods=["GET","POST"])
+def res():
+    operadores = {
+        0: 1,
+        1: 10,
+        2: 100,
+        3: 1000,
+        4: 10000,
+        5: 100000,
+        6: 1000000,
+        7: 10000000,
+        8: 100000000,
+        9: 1000000000
+    }
+    colores = {
+        0: 'Negro',
+        1: 'Cafe',
+        2: 'Rojo',
+        4: 'Amarillo',
+        3: 'Naranja',
+        5: 'Verde', 
+        6: 'Azul',
+        7: 'Violeta',
+        8: 'Gris',
+        9: 'Blanco',
+    }
+    registro = []
+    color1_nombre = ""
+    color2_nombre = ""
+    color3_nombre = ""
+    tolerancia = 0
+    resistenciaT = 0
+    resistenciaMin = 0
+    resistenciaMax = 0
+    porcentaje_tolerancia = 0.0
+    resistencia_form = ResistanceForm(request.form) 
+    
+    if request.method == 'POST':
+        color1 = int(resistencia_form.color1.data)
+        color2 = int(resistencia_form.color2.data)
+        color3 = int(resistencia_form.color3.data)
+        tolerancia = int(resistencia_form.tolerancia.data)
+        
+        color1_nombre = colores[color1]
+        color2_nombre = colores[color2]
+        color3_nombre = colores[color3]
+        
+        concat = str(color1) + str(color2)
+        resistenciaT = int(concat) * operadores.get(color3, 1)
+        porcentaje_tolerancia = resistenciaT * (tolerancia / 100)
+        resistenciaMin = resistenciaT - porcentaje_tolerancia
+        resistenciaMax = resistenciaT + porcentaje_tolerancia
+
+    return render_template("resistencia.html", form=resistencia_form, color1=color1_nombre, color2=color2_nombre, color3=color3_nombre, tolerancia=tolerancia, resistenciaT=resistenciaT ,resistenciaMin=resistenciaMin, resistenciaMax=resistenciaMax, color_css_mapping=color_css_mapping)
+
+ 
 if __name__=="__main__":
     app.run(debug=True)
